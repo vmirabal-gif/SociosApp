@@ -1,20 +1,24 @@
 import { cn } from "@/lib/utils";
+import type { EstadoSocio } from "@/lib/types/socios";
 
 interface StatusBadgeProps {
-  status: "active" | "overdue" | "suspended";
+  status: EstadoSocio;
 }
 
-const statusConfig = {
-  active: {
+const statusConfig: Record<
+  EstadoSocio,
+  { label: string; className: string }
+> = {
+  ACTIVO: {
     label: "Activo",
     className: "bg-status-active text-status-active-foreground",
   },
-  overdue: {
+  MOROSO: {
     label: "Moroso",
     className: "bg-status-overdue text-status-overdue-foreground",
   },
-  suspended: {
-    label: "Suspendido",
+  INACTIVO: {
+    label: "Inactivo",
     className: "bg-status-suspended text-status-suspended-foreground",
   },
 };

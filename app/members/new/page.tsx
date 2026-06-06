@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Save, UserPlus, Users, Trash2, Crown } from "lucide-react";
 import Link from "next/link";
+import { createGrupoFamiliar, createSocioIndividual } from "@/lib/socios/api";
+import {
+  parseFamilyForm,
+  parseIndividualForm,
+  type FamilyMemberInput,
+  type ParentescoTipo,
+} from "@/lib/types/socios";
 
 interface FamilyMember {
   id: string;
@@ -37,6 +45,18 @@ const relationshipOptions = [
   { value: "other", label: "Otro" },
 ];
 
+function getErrorMessage(error: unknown): string {
+  if (
+    error &&
+    typeof error === "object" &&
+    "code" in error &&
+    error.code === "23505"
+  ) {
+    return "Ya existe un socio con ese DNI o número de socio.";
+  }
+  return "No se pudo guardar el socio. Intentá nuevamente.";
+}
+
 export default function NewMemberPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,15 +65,53 @@ export default function NewMemberPage() {
   const handleSubmitIndividual = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    router.push("/members");
+
+    try {
+      const form = new FormData(e.currentTarget);
+      await createSocioIndividual(parseIndividualForm(form));
+      toast.success("Socio registrado correctamente.");
+      router.push("/members");
+    } catch (error) {
+      console.error("[NewMemberPage] Error al guardar socio individual:", error);
+      toast.error(getErrorMessage(error));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleSubmitFamily = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    router.push("/members");
+
+    try {
+      const integrantesSinParentesco = familyMembers.filter(
+        (m) => !m.relationship
+      );
+      if (integrantesSinParentesco.length > 0) {
+        toast.error("Todos los integrantes deben tener un parentesco asignado.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      const integrantes: FamilyMemberInput[] = familyMembers.map((m) => ({
+        nombre: m.firstName.trim(),
+        apellido: m.lastName.trim(),
+        dni: m.dni.trim(),
+        fecha_nacimiento: m.birthDate,
+        parentesco: m.relationship as ParentescoTipo,
+        telefono: m.phone.trim() || undefined,
+      }));
+
+      const form = new FormData(e.currentTarget);
+      await createGrupoFamiliar(parseFamilyForm(form, integrantes));
+      toast.success("Grupo familiar registrado correctamente.");
+      router.push("/members");
+    } catch (error) {
+      console.error("[NewMemberPage] Error al guardar grupo familiar:", error);
+      toast.error(getErrorMessage(error));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const addFamilyMember = () => {

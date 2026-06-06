@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Search, Plus, Pencil, Eye, MoreHorizontal } from "lucide-react";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -28,15 +29,59 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { mockMembers, memberTypes, memberStatuses, type Member } from "@/lib/data";
+import { fetchSocios } from "@/lib/socios/api";
+import { fetchSaldosPorMiembros } from "@/lib/cuenta-corriente/api";
+import { formatCurrencyARS } from "@/lib/cuenta-corriente/utils";
+import type { SaldoCuenta } from "@/lib/types/cuenta-corriente";
+import {
+  memberTypes,
+  memberStatuses,
+  type Member,
+} from "@/lib/types/socios";
 
 export default function MembersPage() {
+  const [members, setMembers] = useState<Member[]>([]);
+  const [saldos, setSaldos] = useState<Record<string, SaldoCuenta>>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadMembers() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const data = await fetchSocios();
+        const saldosMap = await fetchSaldosPorMiembros(data);
+        if (!cancelled) {
+          setMembers(data);
+          setSaldos(saldosMap);
+        }
+      } catch {
+        if (!cancelled) {
+          setError("No se pudieron cargar los socios. Intentá nuevamente.");
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadMembers();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const filteredMembers = useMemo(() => {
-    return mockMembers.filter((member) => {
+    return members.filter((member) => {
       const matchesSearch =
         searchQuery === "" ||
         member.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -52,7 +97,7 @@ export default function MembersPage() {
 
       return matchesSearch && matchesStatus && matchesType;
     });
-  }, [searchQuery, statusFilter, typeFilter]);
+  }, [members, searchQuery, statusFilter, typeFilter]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("es-ES", {
@@ -62,16 +107,121 @@ export default function MembersPage() {
     });
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("es-ES", {
-      style: "currency",
-      currency: "EUR",
-    }).format(amount);
-  };
-
   const getMemberTypeLabel = (type: Member["memberType"]) => {
     const found = memberTypes.find((t) => t.value === type);
     return found?.label ?? type;
+  };
+
+  const renderTableBody = () => {
+    if (loading) {
+      return Array.from({ length: 5 }).map((_, i) => (
+        <TableRow key={i}>
+          {Array.from({ length: 9 }).map((__, j) => (
+            <TableCell key={j}>
+              <Skeleton className="h-4 w-full" />
+            </TableCell>
+          ))}
+        </TableRow>
+      ));
+    }
+
+    if (error) {
+      return (
+        <TableRow>
+          <TableCell
+            colSpan={9}
+            className="h-24 text-center text-destructive"
+          >
+            {error}
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    if (filteredMembers.length === 0) {
+      return (
+        <TableRow>
+          <TableCell
+            colSpan={9}
+            className="h-24 text-center text-muted-foreground"
+          >
+            No se encontraron socios.
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    return filteredMembers.map((member) => (
+      <TableRow key={member.id}>
+        <TableCell className="font-medium text-primary">
+          {member.memberNumber}
+        </TableCell>
+        <TableCell className="font-medium">
+          {member.firstName} {member.lastName}
+        </TableCell>
+        <TableCell className="text-muted-foreground">
+          {member.dni}
+        </TableCell>
+        <TableCell>
+          <span className="rounded-md bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground">
+            {getMemberTypeLabel(member.memberType)}
+          </span>
+        </TableCell>
+        <TableCell className="text-muted-foreground">
+          {member.familyGroup ?? "—"}
+        </TableCell>
+        <TableCell>
+          <StatusBadge status={member.status} />
+        </TableCell>
+        <TableCell className="text-right">
+          {(() => {
+            const saldo = saldos[member.id] ?? { monto: 0, tipo: "al_dia" as const };
+            if (saldo.tipo === "debe") {
+              return (
+                <span className="font-medium text-status-overdue-foreground">
+                  {formatCurrencyARS(saldo.monto)}
+                </span>
+              );
+            }
+            if (saldo.tipo === "a_favor") {
+              return (
+                <span className="text-primary">
+                  +{formatCurrencyARS(saldo.monto)}
+                </span>
+              );
+            }
+            return <span className="text-muted-foreground">Al día</span>;
+          })()}
+        </TableCell>
+        <TableCell className="text-muted-foreground">
+          {formatDate(member.registrationDate)}
+        </TableCell>
+        <TableCell className="text-right">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <MoreHorizontal className="h-4 w-4" />
+                <span className="sr-only">Abrir menú</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link href={`/members/${member.id}`} className="flex items-center gap-2">
+                  <Eye className="h-4 w-4" />
+                  Ver Detalles
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href={`/members/${member.id}/edit`} className="flex items-center gap-2">
+                  <Pencil className="h-4 w-4" />
+                  Editar Socio
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </TableCell>
+      </TableRow>
+    ));
   };
 
   return (
@@ -88,6 +238,7 @@ export default function MembersPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9"
+                disabled={loading}
               />
             </div>
 
@@ -147,87 +298,15 @@ export default function MembersPage() {
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {filteredMembers.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={9}
-                    className="h-24 text-center text-muted-foreground"
-                  >
-                    No se encontraron socios.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredMembers.map((member) => (
-                  <TableRow key={member.id}>
-                    <TableCell className="font-medium text-primary">
-                      {member.memberNumber}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {member.firstName} {member.lastName}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {member.dni}
-                    </TableCell>
-                    <TableCell>
-                      <span className="rounded-md bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground">
-                        {getMemberTypeLabel(member.memberType)}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {member.familyGroup ?? "—"}
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={member.status} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {member.currentDebt > 0 ? (
-                        <span className="font-medium text-status-overdue-foreground">
-                          {formatCurrency(member.currentDebt)}
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground">
-                          {formatCurrency(0)}
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {formatDate(member.registrationDate)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Abrir menú</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem asChild>
-                            <Link href={`/members/${member.id}`} className="flex items-center gap-2">
-                              <Eye className="h-4 w-4" />
-                              Ver Detalles
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem asChild>
-                            <Link href={`/members/${member.id}/edit`} className="flex items-center gap-2">
-                              <Pencil className="h-4 w-4" />
-                              Editar Socio
-                            </Link>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
+            <TableBody>{renderTableBody()}</TableBody>
           </Table>
         </div>
 
         {/* Results Count */}
         <div className="text-sm text-muted-foreground">
-          Mostrando {filteredMembers.length} de {mockMembers.length} socios
+          {loading
+            ? "Cargando socios..."
+            : `Mostrando ${filteredMembers.length} de ${members.length} socios`}
         </div>
       </div>
     </DashboardLayout>

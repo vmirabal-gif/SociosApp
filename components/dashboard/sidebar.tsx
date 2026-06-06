@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users, UserPlus, LayoutDashboard, CreditCard } from "lucide-react";
+import { Users, UserPlus, LayoutDashboard, CreditCard, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -10,6 +10,7 @@ const navigation = [
   { name: "Socios", href: "/members", icon: Users },
   { name: "Nuevo Socio", href: "/members/new", icon: UserPlus },
   { name: "Pagos", href: "/payments", icon: CreditCard },
+  { name: "Configuración", href: "/settings", icon: Settings },
 ];
 
 export function Sidebar() {

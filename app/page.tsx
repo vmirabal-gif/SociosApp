@@ -1,15 +1,27 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, UserCheck, AlertCircle } from "lucide-react";
-import { mockMembers } from "@/lib/data";
+import { fetchSocios } from "@/lib/socios/api";
+import type { Member } from "@/lib/types/socios";
 import Link from "next/link";
 
 export default function DashboardPage() {
-  const totalMembers = mockMembers.length;
-  const activeMembers = mockMembers.filter((m) => m.status === "active").length;
-  const overdueMembers = mockMembers.filter((m) => m.status === "overdue").length;
+  const [members, setMembers] = useState<Member[]>([]);
+
+  useEffect(() => {
+    fetchSocios()
+      .then(setMembers)
+      .catch((error) => {
+        console.error("[DashboardPage] Error al cargar socios:", error);
+      });
+  }, []);
+
+  const totalMembers = members.length;
+  const activeMembers = members.filter((m) => m.status === "ACTIVO").length;
+  const overdueMembers = members.filter((m) => m.status === "MOROSO").length;
 
   const stats = [
     {
@@ -24,24 +36,24 @@ export default function DashboardPage() {
       value: activeMembers,
       icon: UserCheck,
       description: "Al día con pagos",
-      href: "/members?status=active",
+      href: "/members?status=ACTIVO",
     },
     {
       title: "Morosos",
       value: overdueMembers,
       icon: AlertCircle,
       description: "Requieren atención",
-      href: "/members?status=overdue",
+      href: "/members?status=MOROSO",
     },
   ];
 
-  const getStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      active: "Activo",
-      overdue: "Moroso",
-      suspended: "Suspendido",
+  const getStatusLabel = (status: Member["status"]) => {
+    const labels: Record<Member["status"], string> = {
+      ACTIVO: "Activo",
+      MOROSO: "Moroso",
+      INACTIVO: "Inactivo",
     };
-    return labels[status] ?? status;
+    return labels[status];
   };
 
   return (
@@ -103,7 +115,7 @@ export default function DashboardPage() {
                 </div>
               </Link>
               <Link
-                href="/members?status=overdue"
+                href="/members?status=MOROSO"
                 className="flex items-center gap-3 rounded-lg border border-border p-4 transition-colors hover:bg-accent"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-status-overdue">
@@ -131,38 +143,44 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {mockMembers.slice(0, 5).map((member) => (
-                <div
-                  key={member.id}
-                  className="flex items-center justify-between rounded-lg border border-border p-3"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-medium text-primary">
-                      {member.firstName[0]}
-                      {member.lastName[0]}
-                    </div>
-                    <div>
-                      <p className="font-medium text-card-foreground">
-                        {member.firstName} {member.lastName}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {member.memberNumber}
-                      </p>
-                    </div>
-                  </div>
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                      member.status === "active"
-                        ? "bg-status-active text-status-active-foreground"
-                        : member.status === "overdue"
-                        ? "bg-status-overdue text-status-overdue-foreground"
-                        : "bg-status-suspended text-status-suspended-foreground"
-                    }`}
+              {members.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  No hay socios registrados todavía.
+                </p>
+              ) : (
+                members.slice(0, 5).map((member) => (
+                  <div
+                    key={member.id}
+                    className="flex items-center justify-between rounded-lg border border-border p-3"
                   >
-                    {getStatusLabel(member.status)}
-                  </span>
-                </div>
-              ))}
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-medium text-primary">
+                        {member.firstName[0]}
+                        {member.lastName[0]}
+                      </div>
+                      <div>
+                        <p className="font-medium text-card-foreground">
+                          {member.firstName} {member.lastName}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {member.memberNumber}
+                        </p>
+                      </div>
+                    </div>
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        member.status === "ACTIVO"
+                          ? "bg-status-active text-status-active-foreground"
+                          : member.status === "MOROSO"
+                          ? "bg-status-overdue text-status-overdue-foreground"
+                          : "bg-status-suspended text-status-suspended-foreground"
+                      }`}
+                    >
+                      {getStatusLabel(member.status)}
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
