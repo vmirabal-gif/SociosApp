@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { requireProfile } from "@/lib/auth/api";
 import {
   calcularSaldo,
   contarCuotasImpagas,
@@ -143,6 +144,8 @@ async function fetchTarifasVigentesMap(): Promise<
 export async function updateConfiguracionCuotas(
   cuotas: Pick<ConfiguracionCuota, "tipoSocio" | "monto">[]
 ): Promise<ConfiguracionCuota[]> {
+  await requireProfile(["ADMINISTRADOR"]);
+
   const vigentes = await fetchConfiguracionCuotas();
   const hoy = new Date().toISOString().split("T")[0];
 
@@ -229,6 +232,7 @@ async function insertCargo(params: {
     monto: params.monto,
     periodo: params.periodo,
     concepto,
+    estado_cuota: "PENDIENTE",
     configuracion_cuota_id: params.configuracionCuotaId,
     generacion_cuota_id: params.generacionCuotaId ?? null,
   });
@@ -246,6 +250,8 @@ export async function registrarPago(
   member: Member,
   input: RegistrarPagoInput
 ): Promise<void> {
+  await requireProfile(["ADMINISTRADOR"]);
+
   const sujeto = resolverSujetoCobro(member);
   const concepto = input.notas?.trim()
     ? `Pago — ${input.notas.trim()}`
@@ -276,6 +282,8 @@ export async function generarCuotaIndividual(
   result: "created" | "skipped" | "not_eligible";
   periodo: string;
 }> {
+  await requireProfile(["ADMINISTRADOR"]);
+
   const periodo = resolverPeriodo(periodoInput);
   const sujeto = resolverSujetoCobro(member);
 
@@ -333,6 +341,8 @@ export async function eliminarMovimiento(
   member: Member,
   movimientoId: string
 ): Promise<void> {
+  await requireProfile(["ADMINISTRADOR"]);
+
   const sujeto = resolverSujetoCobro(member);
 
   const { data: movimiento, error: fetchError } = await supabase
@@ -375,6 +385,8 @@ export async function eliminarMovimiento(
 export async function generarCuotasMasivas(
   periodoInput?: string
 ): Promise<GeneracionMasivaResult> {
+  await requireProfile(["ADMINISTRADOR"]);
+
   const periodo = resolverPeriodo(periodoInput);
   const diag = crearDiagnostico(periodo);
 

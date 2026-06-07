@@ -4,6 +4,8 @@ export type TipoMovimiento = "CARGO" | "PAGO";
 
 export type SaldoTipo = "debe" | "al_dia" | "a_favor";
 
+export type EstadoCuotaMovimiento = "PENDIENTE" | "PAGADA";
+
 export interface MovimientoRow {
   id: string;
   socio_id: string | null;
@@ -16,6 +18,7 @@ export interface MovimientoRow {
   notas: string | null;
   configuracion_cuota_id: string | null;
   generacion_cuota_id: string | null;
+  estado_cuota: EstadoCuotaMovimiento | null;
   created_at: string;
 }
 

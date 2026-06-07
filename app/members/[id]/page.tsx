@@ -87,7 +87,7 @@ export default function MemberDetailsPage({
 
   if (loading) {
     return (
-      <DashboardLayout title="Cargando..." subtitle="">
+      <DashboardLayout title="Cargando..." subtitle="" allowedRoles={["ADMINISTRADOR"]}>
         <div className="mx-auto max-w-4xl space-y-6">
           <Skeleton className="h-8 w-48" />
           <div className="grid gap-6 lg:grid-cols-3">
@@ -106,7 +106,11 @@ export default function MemberDetailsPage({
 
   if (error || !member || !cuenta || !saldo) {
     return (
-      <DashboardLayout title="Socio No Encontrado" subtitle="">
+      <DashboardLayout
+        title="Socio No Encontrado"
+        subtitle=""
+        allowedRoles={["ADMINISTRADOR"]}
+      >
         <div className="flex flex-col items-center justify-center py-12">
           <p className="text-muted-foreground mb-4">
             {error ?? "El socio que buscas no existe."}
@@ -123,6 +127,7 @@ export default function MemberDetailsPage({
     <DashboardLayout
       title={`${member.firstName} ${member.lastName}`}
       subtitle={member.memberNumber}
+      allowedRoles={["ADMINISTRADOR"]}
     >
       <div className="mx-auto max-w-4xl">
         <div className="mb-6 flex items-center justify-between">

@@ -57,7 +57,11 @@ export default function DashboardPage() {
   };
 
   return (
-    <DashboardLayout title="Panel" subtitle="Resumen de tu club deportivo">
+    <DashboardLayout
+      title="Panel"
+      subtitle="Resumen de tu club deportivo"
+      allowedRoles={["ADMINISTRADOR"]}
+    >
       <div className="space-y-6">
         {/* Stats Grid */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

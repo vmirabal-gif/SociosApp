@@ -140,7 +140,11 @@ export default function NewMemberPage() {
   };
 
   return (
-    <DashboardLayout title="Nuevo Socio" subtitle="Registrar un nuevo socio del club">
+    <DashboardLayout
+      title="Nuevo Socio"
+      subtitle="Registrar un nuevo socio del club"
+      allowedRoles={["ADMINISTRADOR"]}
+    >
       <div className="mx-auto max-w-4xl">
         {/* Back Button */}
         <Link

@@ -6,7 +6,11 @@ import { Calendar } from "lucide-react";
 
 export default function SchedulePage() {
   return (
-    <DashboardLayout title="Horarios" subtitle="Gestión de horarios y reservas">
+    <DashboardLayout
+      title="Horarios"
+      subtitle="Gestión de horarios y reservas"
+      allowedRoles={["ADMINISTRADOR"]}
+    >
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

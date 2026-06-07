@@ -6,7 +6,11 @@ import { GeneracionCuotasSection } from "@/components/settings/generacion-cuotas
 
 export default function SettingsPage() {
   return (
-    <DashboardLayout title="Configuración" subtitle="Ajustes del sistema">
+    <DashboardLayout
+      title="Configuración"
+      subtitle="Ajustes del sistema"
+      allowedRoles={["ADMINISTRADOR"]}
+    >
       <div className="mx-auto max-w-2xl space-y-6">
         <CuotasConfigSection />
         <GeneracionCuotasSection />

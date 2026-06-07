@@ -142,7 +142,7 @@ export default function EditMemberPage({
 
   if (loading) {
     return (
-      <DashboardLayout title="Editar Socio" subtitle="">
+      <DashboardLayout title="Editar Socio" subtitle="" allowedRoles={["ADMINISTRADOR"]}>
         <div className="mx-auto max-w-3xl space-y-6">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-64 w-full" />
@@ -154,7 +154,11 @@ export default function EditMemberPage({
 
   if (error || !member) {
     return (
-      <DashboardLayout title="Socio No Encontrado" subtitle="">
+      <DashboardLayout
+        title="Socio No Encontrado"
+        subtitle=""
+        allowedRoles={["ADMINISTRADOR"]}
+      >
         <div className="flex flex-col items-center justify-center py-12">
           <p className="text-muted-foreground mb-4">
             {error ?? "El socio que buscas no existe."}
@@ -171,6 +175,7 @@ export default function EditMemberPage({
     <DashboardLayout
       title="Editar Socio"
       subtitle={`Editando a ${member.firstName} ${member.lastName}`}
+      allowedRoles={["ADMINISTRADOR"]}
     >
       <div className="mx-auto max-w-3xl">
         {/* Back Button */}

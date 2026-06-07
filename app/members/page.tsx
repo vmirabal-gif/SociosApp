@@ -225,7 +225,11 @@ export default function MembersPage() {
   };
 
   return (
-    <DashboardLayout title="Socios" subtitle="Gestiona los socios de tu club">
+    <DashboardLayout
+      title="Socios"
+      subtitle="Gestiona los socios de tu club"
+      allowedRoles={["ADMINISTRADOR"]}
+    >
       <div className="space-y-6">
         {/* Actions Bar */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

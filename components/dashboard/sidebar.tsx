@@ -1,20 +1,74 @@
 "use client";
 
 import Link from "next/link";
+import type { ComponentType } from "react";
 import { usePathname } from "next/navigation";
-import { Users, UserPlus, LayoutDashboard, CreditCard, Settings } from "lucide-react";
+import {
+  Users,
+  UserPlus,
+  LayoutDashboard,
+  CreditCard,
+  Settings,
+  Wallet,
+  ClipboardList,
+  ShieldCheck,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/components/auth/auth-provider";
+import type { RolUsuario } from "@/lib/types/auth";
 
 const navigation = [
-  { name: "Panel", href: "/", icon: LayoutDashboard },
-  { name: "Socios", href: "/members", icon: Users },
-  { name: "Nuevo Socio", href: "/members/new", icon: UserPlus },
-  { name: "Pagos", href: "/payments", icon: CreditCard },
-  { name: "Configuración", href: "/settings", icon: Settings },
-];
+  { name: "Panel", href: "/", icon: LayoutDashboard, roles: ["ADMINISTRADOR"] },
+  { name: "Socios", href: "/members", icon: Users, roles: ["ADMINISTRADOR"] },
+  {
+    name: "Nuevo Socio",
+    href: "/members/new",
+    icon: UserPlus,
+    roles: ["ADMINISTRADOR"],
+  },
+  {
+    name: "Pagos",
+    href: "/payments",
+    icon: CreditCard,
+    roles: ["ADMINISTRADOR", "CONTADOR"],
+  },
+  {
+    name: "Cobranza",
+    href: "/cobranza",
+    icon: Wallet,
+    roles: ["ADMINISTRADOR", "CONTADOR", "COBRADOR"],
+  },
+  {
+    name: "Rendiciones",
+    href: "/cobranza/rendiciones",
+    icon: ClipboardList,
+    roles: ["ADMINISTRADOR", "CONTADOR", "COBRADOR"],
+  },
+  {
+    name: "Configuración",
+    href: "/settings",
+    icon: Settings,
+    roles: ["ADMINISTRADOR"],
+  },
+  {
+    name: "Usuarios",
+    href: "/usuarios",
+    icon: ShieldCheck,
+    roles: ["ADMINISTRADOR"],
+  },
+] satisfies {
+  name: string;
+  href: string;
+  icon: ComponentType<{ className?: string }>;
+  roles: RolUsuario[];
+}[];
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { profile } = useAuth();
+  const visibleNavigation = navigation.filter(
+    (item) => profile && item.roles.includes(profile.rol)
+  );
 
   return (
     <aside className="flex h-screen w-64 flex-col border-r border-sidebar-border bg-sidebar">
@@ -28,9 +82,13 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 space-y-1 px-3 py-4">
-        {navigation.map((item) => {
-          const isActive = pathname === item.href || 
-            (item.href !== "/" && pathname.startsWith(item.href));
+        {visibleNavigation.map((item) => {
+          const isActive =
+            item.href === "/cobranza"
+              ? pathname.startsWith("/cobranza") &&
+                !pathname.startsWith("/cobranza/rendiciones")
+              : pathname === item.href ||
+                (item.href !== "/" && pathname.startsWith(item.href));
           
           return (
             <Link
