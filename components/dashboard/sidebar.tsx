@@ -63,7 +63,12 @@ const navigation = [
   roles: RolUsuario[];
 }[];
 
-export function Sidebar() {
+interface SidebarProps {
+  className?: string;
+  onNavigate?: () => void;
+}
+
+export function Sidebar({ className, onNavigate }: SidebarProps) {
   const pathname = usePathname();
   const { profile } = useAuth();
   const visibleNavigation = navigation.filter(
@@ -71,7 +76,12 @@ export function Sidebar() {
   );
 
   return (
-    <aside className="flex h-screen w-64 flex-col border-r border-sidebar-border bg-sidebar">
+    <aside
+      className={cn(
+        "flex h-screen w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar",
+        className
+      )}
+    >
       {/* Logo */}
       <div className="flex h-16 items-center gap-2 border-b border-sidebar-border px-4">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary">
@@ -94,6 +104,7 @@ export function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
+              onClick={onNavigate}
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive

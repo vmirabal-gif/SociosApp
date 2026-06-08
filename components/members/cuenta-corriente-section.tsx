@@ -159,7 +159,7 @@ export function CuentaCorrienteSection({
   return (
     <>
       <Card>
-        <CardHeader className="flex flex-row items-start justify-between gap-4">
+        <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-1">
             <CardTitle className="flex items-center gap-2 text-lg">
               <CreditCard className="h-5 w-5" />
@@ -207,8 +207,8 @@ export function CuentaCorrienteSection({
             </Button>
           </div>
 
-          <div className="rounded-lg border border-border">
-            <Table>
+          <div className="overflow-x-auto rounded-lg border border-border">
+            <Table className="min-w-[640px]">
               <TableHeader>
                 <TableRow className="bg-muted/50">
                   <TableHead>Fecha</TableHead>

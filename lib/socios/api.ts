@@ -1,4 +1,6 @@
 import { supabase } from "@/lib/supabase";
+import { generarCuotaIndividual } from "@/lib/cuenta-corriente/api";
+import { getPeriodoFromDate } from "@/lib/cuenta-corriente/utils";
 import {
   mapSocioToMember,
   type CreateGrupoFamiliarInput,
@@ -81,7 +83,10 @@ export async function createSocioIndividual(
     throw error;
   }
 
-  return mapSocioToMember(data as SocioRow);
+  const member = mapSocioToMember(data as SocioRow);
+  await generarCuotaIndividual(member, getPeriodoFromDate(input.fecha_alta));
+
+  return member;
 }
 
 export async function createGrupoFamiliar(
@@ -101,24 +106,34 @@ export async function createGrupoFamiliar(
     throw grupoError;
   }
 
-  const { error: titularError } = await supabase.from("socios").insert({
-    nombre: input.titular.nombre,
-    apellido: input.titular.apellido,
-    dni: input.titular.dni,
-    fecha_nacimiento: input.titular.fecha_nacimiento,
-    fecha_alta: input.titular.fecha_alta,
-    telefono: input.titular.telefono,
-    email: input.titular.email ?? null,
-    direccion: input.titular.direccion ?? null,
-    tipo_socio: "FAMILIAR",
-    grupo_familiar_id: grupo.id,
-    es_titular: true,
-  });
+  const { data: titular, error: titularError } = await supabase
+    .from("socios")
+    .insert({
+      nombre: input.titular.nombre,
+      apellido: input.titular.apellido,
+      dni: input.titular.dni,
+      fecha_nacimiento: input.titular.fecha_nacimiento,
+      fecha_alta: input.titular.fecha_alta,
+      telefono: input.titular.telefono,
+      email: input.titular.email ?? null,
+      direccion: input.titular.direccion ?? null,
+      tipo_socio: "FAMILIAR",
+      grupo_familiar_id: grupo.id,
+      es_titular: true,
+    })
+    .select(SOCIO_SELECT)
+    .single();
 
   if (titularError) {
     console.error("[createGrupoFamiliar] Error al crear titular:", titularError);
     throw titularError;
   }
+
+  const titularMember = mapSocioToMember(titular as SocioRow);
+  await generarCuotaIndividual(
+    titularMember,
+    getPeriodoFromDate(input.titular.fecha_alta)
+  );
 
   if (input.integrantes.length > 0) {
     const { error: integrantesError } = await supabase.from("socios").insert(

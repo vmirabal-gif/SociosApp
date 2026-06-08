@@ -484,7 +484,7 @@ export async function generarCuotasMasivas(
         omitidos++;
         logDiag(
           diag,
-          `Omitido ${socio.nombre} ${socio.apellido}: alta ${socio.fecha_alta} → primera cuota después de ${periodo}`
+          `Omitido ${socio.nombre} ${socio.apellido}: alta ${socio.fecha_alta} posterior al período ${periodo}`
         );
         continue;
       }

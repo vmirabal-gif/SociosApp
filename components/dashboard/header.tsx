@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Menu } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,9 +16,10 @@ import { roleLabels } from "@/lib/types/auth";
 interface HeaderProps {
   title: string;
   subtitle?: string;
+  onMenuClick?: () => void;
 }
 
-export function Header({ title, subtitle }: HeaderProps) {
+export function Header({ title, subtitle, onMenuClick }: HeaderProps) {
   const { profile, signOut } = useAuth();
   const initials =
     profile?.nombre || profile?.apellido
@@ -26,15 +27,28 @@ export function Header({ title, subtitle }: HeaderProps) {
       : "U";
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-border bg-card px-6">
-      <div>
-        <h1 className="text-xl font-semibold text-card-foreground">{title}</h1>
+    <header className="flex h-16 items-center justify-between gap-3 border-b border-border bg-card px-4 sm:px-6">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 shrink-0 md:hidden"
+          onClick={onMenuClick}
+          aria-label="Abrir menú"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+
+        <div className="min-w-0">
+        <h1 className="truncate text-lg font-semibold text-card-foreground sm:text-xl">{title}</h1>
         {subtitle && (
-          <p className="text-sm text-muted-foreground">{subtitle}</p>
+          <p className="truncate text-sm text-muted-foreground">{subtitle}</p>
         )}
+        </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex shrink-0 items-center gap-2 sm:gap-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center gap-2 px-2">

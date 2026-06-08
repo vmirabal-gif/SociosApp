@@ -233,9 +233,9 @@ export default function MembersPage() {
       <div className="space-y-6">
         {/* Actions Bar */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-1 items-center gap-3">
+          <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             {/* Search */}
-            <div className="relative max-w-sm flex-1">
+            <div className="relative w-full sm:max-w-sm sm:flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Buscar socios..."
@@ -248,7 +248,7 @@ export default function MembersPage() {
 
             {/* Status Filter */}
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className="w-full sm:w-[140px]">
                 <SelectValue placeholder="Estado" />
               </SelectTrigger>
               <SelectContent>
@@ -263,7 +263,7 @@ export default function MembersPage() {
 
             {/* Type Filter */}
             <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className="w-full sm:w-[140px]">
                 <SelectValue placeholder="Tipo" />
               </SelectTrigger>
               <SelectContent>
@@ -278,8 +278,8 @@ export default function MembersPage() {
           </div>
 
           {/* New Member Button */}
-          <Link href="/members/new">
-            <Button className="gap-2">
+          <Link href="/members/new" className="w-full sm:w-auto">
+            <Button className="w-full gap-2 sm:w-auto">
               <Plus className="h-4 w-4" />
               Nuevo Socio
             </Button>
@@ -287,8 +287,8 @@ export default function MembersPage() {
         </div>
 
         {/* Members Table */}
-        <div className="rounded-lg border border-border bg-card shadow-sm">
-          <Table>
+        <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
+          <Table className="min-w-[900px]">
             <TableHeader>
               <TableRow className="bg-muted/50">
                 <TableHead>N° Socio</TableHead>

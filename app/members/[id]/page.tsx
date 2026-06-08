@@ -130,7 +130,7 @@ export default function MemberDetailsPage({
       allowedRoles={["ADMINISTRADOR"]}
     >
       <div className="mx-auto max-w-4xl">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Link
             href="/members"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
@@ -138,8 +138,8 @@ export default function MemberDetailsPage({
             <ArrowLeft className="h-4 w-4" />
             Volver a Socios
           </Link>
-          <Link href={`/members/${member.id}/edit`}>
-            <Button className="gap-2">
+          <Link href={`/members/${member.id}/edit`} className="w-full sm:w-auto">
+            <Button className="w-full gap-2 sm:w-auto">
               <Pencil className="h-4 w-4" />
               Editar Socio
             </Button>

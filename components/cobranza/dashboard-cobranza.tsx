@@ -151,7 +151,8 @@ export function DashboardCobranzaSection() {
               {data.porCobrador.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Sin datos del mes.</p>
               ) : (
-                <Table>
+                <div className="overflow-x-auto">
+                <Table className="min-w-[420px]">
                   <TableHeader>
                     <TableRow>
                       <TableHead>Cobrador</TableHead>
@@ -171,6 +172,7 @@ export function DashboardCobranzaSection() {
                     ))}
                   </TableBody>
                 </Table>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -183,7 +185,8 @@ export function DashboardCobranzaSection() {
               {data.porPeriodo.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Sin datos del mes.</p>
               ) : (
-                <Table>
+                <div className="overflow-x-auto">
+                <Table className="min-w-[420px]">
                   <TableHeader>
                     <TableRow>
                       <TableHead>Período</TableHead>
@@ -203,6 +206,7 @@ export function DashboardCobranzaSection() {
                     ))}
                   </TableBody>
                 </Table>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -219,8 +223,8 @@ export function DashboardCobranzaSection() {
               Aún no hay pagos registrados por cobradores.
             </p>
           ) : (
-            <div className="rounded-lg border border-border">
-              <Table>
+            <div className="overflow-x-auto rounded-lg border border-border">
+              <Table className="min-w-[760px]">
                 <TableHeader>
                   <TableRow className="bg-muted/50">
                     <TableHead>Fecha</TableHead>

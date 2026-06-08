@@ -30,6 +30,7 @@ import {
   fetchDetalleRendicion,
   fetchRendiciones,
 } from "@/lib/cobranza/api";
+import { ComprobanteRendicionButton } from "@/components/cobranza/comprobante-rendicion";
 import { formatCurrencyARS } from "@/lib/cuenta-corriente/utils";
 import type { Rendicion, RendicionDetallePago } from "@/lib/types/cobranza";
 
@@ -116,8 +117,8 @@ export function RendicionesSection() {
               No hay rendiciones registradas.
             </p>
           ) : (
-            <div className="rounded-lg border border-border">
-              <Table>
+            <div className="overflow-x-auto rounded-lg border border-border">
+              <Table className="min-w-[780px]">
                 <TableHeader>
                   <TableRow className="bg-muted/50">
                     <TableHead className="w-10" />
@@ -160,23 +161,29 @@ export function RendicionesSection() {
                         <TableCell className="text-right font-medium">
                           {formatCurrencyARS(r.totalRendido)}
                         </TableCell>
-                        <TableCell className="text-right">
-                          {r.estado === "ABIERTA" &&
-                            canCloseRendiciones(profile?.rol) && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setCerrarId(r.id)}
-                            >
-                              Cerrar rendición
-                            </Button>
-                          )}
+                        <TableCell>
+                          <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:justify-end">
+                            {r.estado === "CERRADA" && (
+                              <ComprobanteRendicionButton rendicion={r} />
+                            )}
+                            {r.estado === "ABIERTA" &&
+                              canCloseRendiciones(profile?.rol) && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setCerrarId(r.id)}
+                              >
+                                Cerrar rendición
+                              </Button>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                       {expandida === r.id && detalle.length > 0 && (
                         <TableRow>
                           <TableCell colSpan={7} className="bg-muted/20 p-0">
-                            <Table>
+                            <div className="overflow-x-auto">
+                            <Table className="min-w-[640px]">
                               <TableHeader>
                                 <TableRow>
                                   <TableHead>Socio</TableHead>
@@ -204,6 +211,7 @@ export function RendicionesSection() {
                                 ))}
                               </TableBody>
                             </Table>
+                            </div>
                           </TableCell>
                         </TableRow>
                       )}

@@ -50,6 +50,13 @@ export function getPeriodoActual(): string {
   return `${year}-${month}`;
 }
 
+export function getPeriodoFromDate(dateString: string): string {
+  const date = new Date(dateString + "T12:00:00");
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${year}-${month}`;
+}
+
 const PERIODO_REGEX = /^\d{4}-(0[1-9]|1[0-2])$/;
 
 export function isValidPeriodo(periodo: string): boolean {
@@ -67,13 +74,10 @@ export function resolverPeriodo(periodo?: string): string {
   return value;
 }
 
-/** Alta en mes M → primera cuota en M+1 */
+/** Alta en mes M → primera cuota en M. No genera períodos anteriores al alta. */
 export function puedeGenerarCuota(fechaAlta: string, periodo: string): boolean {
-  const alta = new Date(fechaAlta + "T12:00:00");
-  const [year, month] = periodo.split("-").map(Number);
-  const periodoDate = new Date(year, month - 1, 1);
-  const primeraCuota = new Date(alta.getFullYear(), alta.getMonth() + 1, 1);
-  return periodoDate >= primeraCuota;
+  const periodoAlta = getPeriodoFromDate(fechaAlta);
+  return periodo >= periodoAlta;
 }
 
 export function isSocioExento(

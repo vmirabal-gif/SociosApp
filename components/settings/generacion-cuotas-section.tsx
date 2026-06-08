@@ -110,7 +110,7 @@ export function GeneracionCuotasSection() {
         )}
 
         {diagnostico && (
-          <div className="rounded-lg border border-dashed border-border bg-muted/20 p-4 text-xs font-mono space-y-2">
+          <div className="max-w-full space-y-2 overflow-x-auto break-words rounded-lg border border-dashed border-border bg-muted/20 p-4 font-mono text-xs">
             <p className="font-sans font-medium text-sm text-foreground">
               Diagnóstico temporal
             </p>

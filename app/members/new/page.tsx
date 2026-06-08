@@ -157,11 +157,11 @@ export default function NewMemberPage() {
 
         <Tabs defaultValue="individual" className="space-y-6">
           <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="individual" className="gap-2">
+            <TabsTrigger value="individual" className="gap-1 text-xs sm:gap-2 sm:text-sm">
               <UserPlus className="h-4 w-4" />
               Socio Individual
             </TabsTrigger>
-            <TabsTrigger value="family" className="gap-2">
+            <TabsTrigger value="family" className="gap-1 text-xs sm:gap-2 sm:text-sm">
               <Users className="h-4 w-4" />
               Grupo Familiar
             </TabsTrigger>
@@ -270,11 +270,11 @@ export default function NewMemberPage() {
                 </CardContent>
               </Card>
 
-              <div className="flex items-center justify-end gap-3">
-                <Button type="button" variant="outline" asChild>
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+                <Button type="button" variant="outline" className="w-full sm:w-auto" asChild>
                   <Link href="/members">Cancelar</Link>
                 </Button>
-                <Button type="submit" disabled={isSubmitting} className="gap-2">
+                <Button type="submit" disabled={isSubmitting} className="w-full gap-2 sm:w-auto">
                   <Save className="h-4 w-4" />
                   {isSubmitting ? "Guardando..." : "Guardar Socio"}
                 </Button>
@@ -446,7 +446,7 @@ export default function NewMemberPage() {
                           </div>
                         </div>
 
-                        <div className="grid gap-4 sm:grid-cols-3">
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                           <div className="space-y-2">
                             <Label>DNI</Label>
                             <Input
@@ -535,11 +535,11 @@ export default function NewMemberPage() {
                 </CardContent>
               </Card>
 
-              <div className="flex items-center justify-end gap-3">
-                <Button type="button" variant="outline" asChild>
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+                <Button type="button" variant="outline" className="w-full sm:w-auto" asChild>
                   <Link href="/members">Cancelar</Link>
                 </Button>
-                <Button type="submit" disabled={isSubmitting} className="gap-2">
+                <Button type="submit" disabled={isSubmitting} className="w-full gap-2 sm:w-auto">
                   <Save className="h-4 w-4" />
                   {isSubmitting ? "Guardando..." : "Guardar Grupo Familiar"}
                 </Button>

@@ -236,10 +236,10 @@ export function RegistrarPagoSection() {
                   <button
                     key={s.id}
                     type="button"
-                    className="flex w-full items-center justify-between px-4 py-3 text-left text-sm hover:bg-muted/50 border-b border-border last:border-0"
+                    className="flex w-full flex-col gap-2 border-b border-border px-4 py-3 text-left text-sm hover:bg-muted/50 last:border-0 sm:flex-row sm:items-center sm:justify-between"
                     onClick={() => seleccionarSocio(s)}
                   >
-                    <span>
+                    <span className="min-w-0 break-words">
                       {s.apellido}, {s.nombre} — DNI {s.dni}
                     </span>
                     <StatusBadge status={s.status} />
@@ -276,8 +276,8 @@ export function RegistrarPagoSection() {
               </p>
             ) : (
               <>
-                <div className="rounded-lg border border-border">
-                  <Table>
+                <div className="overflow-x-auto rounded-lg border border-border">
+                  <Table className="min-w-[640px]">
                     <TableHeader>
                       <TableRow className="bg-muted/50">
                         <TableHead className="w-10" />

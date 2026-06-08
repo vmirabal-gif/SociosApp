@@ -98,12 +98,12 @@ export function CobradoresSection() {
   return (
     <>
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <CardTitle className="flex items-center gap-2 text-lg">
             <UserCog className="h-5 w-5" />
             Cobradores
           </CardTitle>
-          <Button size="sm" className="gap-2" onClick={abrirNuevo}>
+          <Button size="sm" className="w-full gap-2 sm:w-auto" onClick={abrirNuevo}>
             <Plus className="h-4 w-4" />
             Nuevo cobrador
           </Button>
@@ -116,7 +116,8 @@ export function CobradoresSection() {
               No hay cobradores registrados.
             </p>
           ) : (
-            <Table>
+            <div className="overflow-x-auto">
+            <Table className="min-w-[520px]">
               <TableHeader>
                 <TableRow className="bg-muted/50">
                   <TableHead>Nombre</TableHead>
@@ -156,6 +157,7 @@ export function CobradoresSection() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>

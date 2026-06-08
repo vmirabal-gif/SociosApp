@@ -8,7 +8,7 @@
 --   • Saldo = SUM(CARGO) - SUM(PAGO)  (calculado en aplicación, no persistido)
 --   • Una cuota por período y sujeto de cobro (índices únicos parciales)
 --   • INACTIVO manual (estado_manual) no genera cuotas
---   • Alta en mes M → primera cuota en M+1 (lógica en aplicación)
+--   • Alta en mes M → primera cuota en M (lógica en aplicación)
 --   • Grupo familiar: un CARGO por grupo_familiar_id; referencia fecha_alta titular
 -- =============================================================================
 

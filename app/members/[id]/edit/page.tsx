@@ -364,11 +364,11 @@ export default function EditMemberPage({
           </Card>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-3">
-            <Button type="button" variant="outline" asChild>
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+            <Button type="button" variant="outline" className="w-full sm:w-auto" asChild>
               <Link href={`/members/${member.id}`}>Cancelar</Link>
             </Button>
-            <Button type="submit" disabled={isSubmitting} className="gap-2">
+            <Button type="submit" disabled={isSubmitting} className="w-full gap-2 sm:w-auto">
               <Save className="h-4 w-4" />
               {isSubmitting ? "Guardando..." : "Guardar Cambios"}
             </Button>
